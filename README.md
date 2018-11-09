@@ -12,26 +12,29 @@ Install using NPM:
 npm install --save-dev @olenbetong/appframe-client
 ```
 
-### Command line
+### Usage
 
-To start the proxy, run the `appframe-proxy` command. You will be prompted for any required option that wasn't passed as an argument to the command.
+Import the client class, and pass username, password and hostname in an options object to the constructor. Call the login method to authenticate.
 
-```
-appframe-proxy --username myuser --password mypassword --hostname example.com
-```
-
-### CommonJS
-
-You can import the server with CommonJS.
+When authentication is complete, use the `get` or `post` methods to run requests to the AppframeWeb website.
 
 ```js
-const proxy = require('@olenbetong/appframe-proxy');
-proxy.startServer({
-	hostname: 'example.com',
+const AppframeClient = require('@olenbetong/appframe-client');
+const client = new AppframeClient({
+	username: 'mylogin',
 	password: 'Password1',
-	port: 8087,
-	username: 'myuser',
-})
+	hostname: 'example.com'
+});
+
+const status = await client.login();
+if (status.success) {
+	const myResponse = await client.get('/my/api');
+	const myApiData = JSON.parse(myResponse);
+
+	console.log(myApiData);
+} else {
+	console.error(status.error);
+}
 ```
 
 ### Options
@@ -43,6 +46,6 @@ proxy.startServer({
 
 ## Changes
 
-### 2018-11-09 - 1.01
+### 2018-11-09 - 1.0.0
 
- * Fixed provided options ignored when using CommonJS
+ * Migrated client to it's own NPM package from @olenbetong/appframe-proxy
