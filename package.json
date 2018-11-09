@@ -1,0 +1,32 @@
+{
+  "name": "@olenbetong/appframe-client",
+  "version": "0.9.0",
+  "description": "Simple client class to log in to an AppframeWeb website and run requests with the session.",
+  "main": "appframe.js",
+  "scripts": {
+    "test": "jest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://bvhansen.visualstudio.com/appframe-client/_git/appframe-client"
+  },
+  "keywords": [
+    "appframe",
+    "appframeweb",
+    "\"appframe",
+    "web\""
+  ],
+  "author": "Bjørnar Vister Hansen <bvh@olenbetong.no>",
+  "license": "MIT",
+  "devDependencies": {
+    "dotenv": "^6.1.0",
+    "eslint": "^5.8.0",
+    "eslint-plugin-jest": "^22.0.0",
+    "jest": "^23.6.0"
+  },
+  "dependencies": {
+    "cheerio": "^1.0.0-rc.2",
+    "querystring": "^0.2.0",
+    "request-promise-native": "^1.0.5"
+  }
+}
