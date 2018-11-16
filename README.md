@@ -44,8 +44,12 @@ if (status.success) {
  * **hostname** - Hostname the proxy will send requests to
  * **port** (optional) - Port where the proxy will listen to requests (default 8082)
 
-## Changes
+## Changelog
 
-### 2018-11-09 - 1.0.0
+### [1.0.1] - 2018-11-16
+
+ * Moved repository to GitHub
+
+### [1.0.0] - 2018-11-09
 
  * Migrated client to it's own NPM package from @olenbetong/appframe-proxy
