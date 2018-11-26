@@ -64,7 +64,7 @@ class AppframeClient {
 			console.log('Authenticating...');
 
 			const res = await rp(options);
-	
+
 			if (res.statusCode === 200) {
 				const status = JSON.parse(res.body);
 
@@ -182,7 +182,7 @@ class AppframeClient {
 			if (err.statusCode === 401) {
 				if (!isRetry) {
 					const loginRes = await this.login();
-	
+
 					if (loginRes.success) {
 						return await this.request(options, true);
 					} else {
