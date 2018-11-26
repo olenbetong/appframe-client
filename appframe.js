@@ -1,6 +1,6 @@
 const rp = require('request-promise-native');
 const cheerio = require('cheerio');
-const querystring = require('querystring');
+const merge = require('deepmerge');
 
 const loginFailedStr = 'Login failed. Please check your credentials.';
 
@@ -22,29 +22,13 @@ class AppframeClient {
 		this.jar = null;
 	}
 
-	createPostFormRequest(pathname, data) {
-		const body = querystring.stringify(data);
-
-		return {
-			body,
-			headers: {
-				'Content-Length': body.length,
-				'Content-Type': 'application/x-www-form-urlencoded',
-			},
-			jar: this.jar,
-			method: 'POST',
-			resolveWithFullResponse: true,
-			url: this.getUrl(pathname)
-		};
-	}
-
 	getUrl(pathname, query) {
 		const url = new URL(`${this.protocol}//${this.hostname}`);
 		url.pathname = pathname;
 
 		if (query) url.search = query;
 
-		return url;
+		return url.toString();
 	}
 
 	async login() {
@@ -56,35 +40,54 @@ class AppframeClient {
 	
 		const { password, username } = this;
 
-		const body = {
+		const body = JSON.stringify({
 			username,
 			password,
 			remember: false,
-		};
+		});
 
-		const options = this.createPostFormRequest('/login', body);
+		const options = {
+			body,
+			headers: {
+				'Accept': 'application/json',
+				'Content-Length': body.length,
+				'Content-Type': 'application/json; charset=UTF-8',
+				'X-Requested-With': 'XMLHttpRequest'
+			},
+			jar: this.jar,
+			method: 'POST',
+			resolveWithFullResponse: true,
+			url: this.getUrl('login')
+		};
 
 		try {
 			console.log('Authenticating...');
 
 			const res = await rp(options);
 	
-			if (res.statusCode === 200 && !res.body.includes(loginFailedStr)) {
-				console.log('Authentication successful.');
-	
-				return {
-					success: true
-				};
-			} else if (res.body.includes(loginFailedStr)) {
+			if (res.statusCode === 200) {
+				const status = JSON.parse(res.body);
+
+				if (status.success) {
+					console.log('Authentication successful.');
+
+					return status;
+				}
+
 				console.warn(loginFailedStr);
-	
-				return {
-					error: loginFailedStr,
-					success: false
-				};
+
+				return Object.assign(
+					{
+						error: loginFailedStr,
+						success: false
+					},
+					status,
+				);
+
 			}
 
 			console.warn(loginFailedStr);
+
 			return {
 				error: `Login failed (${res.statusCode}: ${res.statusMessage})`,
 				success: false
@@ -93,7 +96,7 @@ class AppframeClient {
 			console.error(err);
 	
 			return {
-				error: err,
+				error: err.message,
 				success: false
 			};
 		}
@@ -102,6 +105,10 @@ class AppframeClient {
 	async logout() {
 		const reqOptions = {
 			jar: this.jar,
+			headers: {
+				'Accept': 'application/json',
+				'X-Requested-With': 'XMLHttpRequest'
+			},
 			method: 'POST',
 			url: this.getUrl('logout'),
 		};
@@ -130,7 +137,7 @@ class AppframeClient {
 		return $('#details pre').text();
 	}
 
-	getOptions(path, method, options) {
+	getOptions(path, method, options = {}) {
 		const [pathname, search] = path.split('?');
 	
 		return Object.assign(
@@ -153,13 +160,17 @@ class AppframeClient {
 	}
 
 	async request(options, isRetry = false) {
-		const reqOptions = Object.assign(
+		const reqOptions = merge(
 			{
-				resolveWithFullResponse: true
+				resolveWithFullResponse: true,
+				headers: {
+					'X-Requested-With': 'XMLHttpRequest' // setting X-Requested-With makes the server return 401 instead of redirecting to login
+				}
 			},
-			options,
-			{ jar: this.jar }
+			options
 		);
+
+		reqOptions.jar = this.jar;
 
 		try {
 			const res = await rp(reqOptions);
@@ -194,7 +205,9 @@ class AppframeClient {
 	
 			return {
 				error: errorMessage,
-				success: false
+				success: false,
+				statusCode: err.statusCode,
+				statusMessage: err.response && err.response.statusMessage,
 			};
 		}
 	}

@@ -8,7 +8,10 @@
 			"type": "node",
 			"request": "launch",
 			"name": "Launch Program",
-			"program": "${workspaceFolder}\\appframe.js"
+			"program": "${workspaceFolder}\\index.js",
+			"skipFiles": [
+				"<node_internals>/**/*.js"
+			]
 		},
 		{
 			"name": "Debug Jest Tests",
@@ -17,8 +20,7 @@
 			"runtimeArgs": [
 				"--inspect-brk",
 				"${workspaceRoot}/node_modules/jest/bin/jest.js",
-				"--runInBand",
-				"./src/appframe.test.js"
+				"--runInBand"
 			],
 			"internalConsoleOptions": "neverOpen",
 			"port": 9229,
