@@ -46,10 +46,19 @@ if (status.success) {
 
 ## Changelog
 
+### [1.0.2] - 2018-11-26
+
+#### Fixed
+
+ * Handle requests that are redirected to login page
+
 ### [1.0.1] - 2018-11-16
+
+#### Changed
 
  * Moved repository to GitHub
 
 ### [1.0.0] - 2018-11-09
+
 
  * Migrated client to it's own NPM package from @olenbetong/appframe-proxy
