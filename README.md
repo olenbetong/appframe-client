@@ -46,6 +46,12 @@ if (status.success) {
 
 ## Changelog
 
+### [1.0.3] - 2018-11-26
+
+#### Changed
+
+ * Updated dependencies
+
 ### [1.0.2] - 2018-11-26
 
 #### Fixed
