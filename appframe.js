@@ -74,11 +74,13 @@ class AppframeClient {
 					return status;
 				}
 
-				console.warn(loginFailedStr);
+				const error = status.error ? `Login failed: ${status.error}` : loginFailedStr;
+
+				console.warn(error);
 
 				return Object.assign(
 					{
-						error: loginFailedStr,
+						error,
 						success: false
 					},
 					status,

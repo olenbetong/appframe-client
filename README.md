@@ -46,6 +46,12 @@ if (status.success) {
 
 ## Changelog
 
+### [1.0.4] - 2018-12-14
+
+#### Changed
+
+ * If server returns error on login, display the error instead of a login failed string.
+
 ### [1.0.3] - 2018-11-26
 
 #### Changed
