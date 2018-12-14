@@ -12,7 +12,7 @@ const {
 const failedClient = new AppframeClient({
 	hostname,
 	password: 'asdlkfje',
-	username: 'asldkfjø',
+	username: 'asldkfje',
 });
 
 const testPath = '/api/elements/1.0/projects?ProjectID=P16-1157';
@@ -62,13 +62,10 @@ describe('AppframeClient', () => {
 
 	it('can get authenticated stuff after login', async () => {
 		const result = await client.get(testPath);
-	
-		expect(result.statusCode).toBe(200);
-	
-		const body = JSON.parse(result.body);
-		expect(body instanceof Array).toBe(true);
-		expect(body.length).toBe(1);
-		expect(body[0].ProjectId).toBe('P16-1157');
+
+		expect(result instanceof Array).toBe(true);
+		expect(result.length).toBe(1);
+		expect(result[0].ProjectId).toBe('P16-1157');
 	});
 	
 	it('parses error messages properly', async () => {

@@ -46,6 +46,12 @@ if (status.success) {
 
 ## Changelog
 
+### [2.0.0] - 2018-12-14
+
+### Breaking changes
+
+ * Client requests now return the body of the response instead of the response. If the content type is JSON, the body will be parsed before it is returned as an object.
+
 ### [1.0.4] - 2018-12-14
 
 #### Changed

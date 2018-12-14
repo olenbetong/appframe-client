@@ -176,6 +176,10 @@ class AppframeClient {
 
 		try {
 			const res = await rp(reqOptions);
+			const contentType = res.headers['content-type'];
+			if (contentType && contentType.indexOf('application/json') > -1) {
+				return JSON.parse(res.body);
+			}
 
 			return res;
 		} catch (err) {
