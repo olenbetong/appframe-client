@@ -52,6 +52,23 @@ describe('AppframeClient', () => {
 		expect(result).toEqual({ success: true });
 		expect(result2).toEqual({ success: true });
 	});
+
+	it('returns session cookies', async () => {
+		const noCookies = client.getSessionCookies();
+		expect(noCookies).toBe(null);
+
+		await client.login();
+		const cookies = client.getSessionCookies();
+
+		expect(cookies).toHaveProperty('AppframeWebAuth');
+		expect(cookies).toHaveProperty('AppframeWebSession');
+		expect(cookies['AppframeWebAuth']).toHaveProperty('creation');
+		expect(cookies['AppframeWebAuth']).toHaveProperty('hostOnly');
+		expect(cookies['AppframeWebAuth']).toHaveProperty('httpOnly');
+		expect(cookies['AppframeWebAuth']).toHaveProperty('path');
+		expect(cookies['AppframeWebAuth']).toHaveProperty('secure');
+		expect(cookies['AppframeWebAuth']).toHaveProperty('value');
+	});
 	
 	it('can log out', async () => {
 		await client.login();

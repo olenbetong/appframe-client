@@ -37,6 +37,46 @@ if (status.success) {
 }
 ```
 
+If you want to use the client to log in, but use the session outside the client, you can get the session cookies using the `getSessionCookies` method.
+
+```js
+const AppframeClient = require('@olenbetong/appframe-client');
+const client = new AppframeClient({
+	username: 'mylogin',
+	password: 'Password1',
+	hostname: 'example.com'
+});
+
+const status = await client.login();
+if (status.success) {
+	const cookies = client.getSessionCookies();
+
+	console.log(cookies);
+	/**
+	 * {
+	 *   AppframeWebAuth: {
+	 *     creation: [Date],
+	 *     hostOnly: [bool],
+	 *     httpOnly: [bool],
+	 *     path: [string],
+	 *     secure: [bool],
+	 *     value: [string],
+	 *   },
+	 *   AppframeWebSession: {
+	 *     creation: [Date],
+	 *     hostOnly: [bool],
+	 *     httpOnly: [bool],
+	 *     path: [string],
+	 *     secure: [bool],
+	 *     value: [string],
+	 *   }
+	 * }
+	 */
+} else {
+	console.error(status.error);
+}
+```
+
 ### Options
 
  * **username** - User that will be used to log in to the AppframeWeb website
@@ -46,9 +86,15 @@ if (status.success) {
 
 ## Changelog
 
+### [UNRELEASED]
+
+#### Added
+
+ * `getSessionCookies` - New method to get session cookies
+
 ### [2.0.0] - 2018-12-14
 
-### Breaking changes
+#### Breaking changes
 
  * Client requests now return the body of the response instead of the response. If the content type is JSON, the body will be parsed before it is returned as an object.
 
@@ -76,7 +122,14 @@ if (status.success) {
 
  * Moved repository to GitHub
 
-### [1.0.0] - 2018-11-09
+### 1.0.0 - 2018-11-09
 
 
  * Migrated client to it's own NPM package from @olenbetong/appframe-proxy
+
+[UNRELEASED]: https://github.com/bjornarvh/appframe-client/compare/v2.0.0...HEAD
+[2.0.0]: https://github.com/bjornarvh/appframe-client/compare/v1.0.4...v2.0.0
+[1.0.4]: https://github.com/bjornarvh/appframe-client/compare/v1.0.3...v1.0.4
+[1.0.3]: https://github.com/bjornarvh/appframe-client/compare/v1.0.2...v1.0.3
+[1.0.2]: https://github.com/bjornarvh/appframe-client/compare/v1.0.1...v1.0.2
+[1.0.1]: https://github.com/bjornarvh/appframe-client/compare/v1.0.0...v1.0.1

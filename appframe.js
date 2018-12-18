@@ -6,19 +6,10 @@ const loginFailedStr = 'Login failed. Please check your credentials.';
 
 class AppframeClient {
 	constructor(props) {
-		const {
-			username,
-			password,
-			hostname,
-		} = props;
-
-		Object.assign(this, {
-			hostname,
-			password,
-			username,
-		});
-		
-		this.protocol = 'https:';
+		this.hostname = props.hostname;
+		this.password = props.password;
+		this.username = props.username;
+		this.protocol = props.protocol || 'https:';
 		this.jar = null;
 	}
 
@@ -147,6 +138,37 @@ class AppframeClient {
 			options,
 			{ uri: this.getUrl(pathname, search) }
 		);
+	}
+
+	getSessionCookies() {
+		if (this.jar) {
+			let sessionCookies = this.jar.getCookies(`${this.protocol}//${this.hostname}`);
+			let cookies = {};
+
+			for (let cookie of sessionCookies) {
+				if (['AppframeWebAuth', 'AppframeWebSession'].includes(cookie.key)) {
+					cookies[cookie.key] = {
+						creation: cookie.creation,
+						httpOnly: cookie.httpOnly,
+						hostOnly: cookie.hostOnly,
+						path: cookie.path,
+						secure: cookie.secure,
+						value: cookie.value,
+					};
+				}
+			}
+
+			if (
+				!cookies.hasOwnProperty('AppframeWebAuth')
+				|| !cookies.hasOwnProperty('AppframeWebSession')
+			) {
+				return null;
+			}
+
+			return cookies;
+		}
+
+		return null;
 	}
 
 	async get(path, options) {
