@@ -86,7 +86,7 @@ if (status.success) {
 
 ## Changelog
 
-### [UNRELEASED]
+### [2.1.0] - 2018-12-18
 
 #### Added
 
@@ -127,7 +127,8 @@ if (status.success) {
 
  * Migrated client to it's own NPM package from @olenbetong/appframe-proxy
 
-[UNRELEASED]: https://github.com/bjornarvh/appframe-client/compare/v2.0.0...HEAD
+[UNRELEASED]: https://github.com/bjornarvh/appframe-client/compare/v2.1.0...HEAD
+[2.1.0]: https://github.com/bjornarvh/appframe-client/compare/v2.0.0...v2.1.0
 [2.0.0]: https://github.com/bjornarvh/appframe-client/compare/v1.0.4...v2.0.0
 [1.0.4]: https://github.com/bjornarvh/appframe-client/compare/v1.0.3...v1.0.4
 [1.0.3]: https://github.com/bjornarvh/appframe-client/compare/v1.0.2...v1.0.3
