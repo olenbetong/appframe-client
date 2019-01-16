@@ -77,13 +77,6 @@ if (status.success) {
 }
 ```
 
-### Options
-
- * **username** - User that will be used to log in to the AppframeWeb website
- * **password** - Password for the user
- * **hostname** - Hostname the proxy will send requests to
- * **port** (optional) - Port where the proxy will listen to requests (default 8082)
-
 ## Changelog
 
 ### [2.1.1] - 2018-12-18
