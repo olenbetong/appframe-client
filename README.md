@@ -1,6 +1,6 @@
 # Appframe Web Client 
 
-A simple proxy server that keeps a user logged in to an AppframeWeb website, and proxies requests to that website. Useful if you are developing applications locally and need to access code modules/data on an AppframeWeb website.
+A simple client to communicate with an AppframeWeb website in a node.js environment.
 
 ## Gettin started
 
