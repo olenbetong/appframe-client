@@ -132,7 +132,7 @@ if (status.success) {
  * Migrated client to it's own NPM package from @olenbetong/appframe-proxy
 
 [UNRELEASED]: https://github.com/bjornarvh/appframe-client/compare/v2.1.1...HEAD
-[2.1.1]: https://github.com/olenbetong/appframe-client/compare/v2.1.1...v2.1.2
+[2.1.2]: https://github.com/olenbetong/appframe-client/compare/v2.1.1...v2.1.2
 [2.1.1]: https://github.com/olenbetong/appframe-client/compare/v2.1.0...v2.1.0
 [2.1.0]: https://github.com/olenbetong/appframe-client/compare/v2.0.0...v2.1.0
 [2.0.0]: https://github.com/olenbetong/appframe-client/compare/v1.0.4...v2.0.0
