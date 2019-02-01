@@ -1,6 +1,7 @@
 # Appframe Web Client 
 
-A simple client to communicate with an AppframeWeb website in a node.js environment.
+A simple client to communicate with an AppframeWeb website in a node.js
+environment.
 
 ## Gettin started
 
@@ -14,66 +15,69 @@ npm install --save-dev @olenbetong/appframe-client
 
 ### Usage
 
-Import the client class, and pass username, password and hostname in an options object to the constructor. Call the login method to authenticate.
+Import the client class, and pass username, password and hostname in an options
+object to the constructor. Call the login method to authenticate.
 
-When authentication is complete, use the `get` or `post` methods to run requests to the AppframeWeb website.
+When authentication is complete, use the `get` or `post` methods to run requests
+to the AppframeWeb website.
 
 ```js
 const AppframeClient = require('@olenbetong/appframe-client');
 const client = new AppframeClient({
-	username: 'mylogin',
-	password: 'Password1',
-	hostname: 'example.com'
+  username: 'mylogin',
+  password: 'Password1',
+  hostname: 'example.com'
 });
 
 const status = await client.login();
 if (status.success) {
-	const myResponse = await client.get('/my/api');
-	const myApiData = JSON.parse(myResponse);
+  const myResponse = await client.get('/my/api');
+  const myApiData = JSON.parse(myResponse);
 
-	console.log(myApiData);
+  console.log(myApiData);
 } else {
-	console.error(status.error);
+  console.error(status.error);
 }
 ```
 
-If you want to use the client to log in, but use the session outside the client, you can get the session cookies using the `getSessionCookies` method.
+If you want to use the client to log in, but use the session outside the client,
+you can get the session cookies using the `getSessionCookies` method.
 
 ```js
 const AppframeClient = require('@olenbetong/appframe-client');
 const client = new AppframeClient({
-	username: 'mylogin',
-	password: 'Password1',
-	hostname: 'example.com'
+  username: 'mylogin',
+  password: 'Password1',
+  hostname: 'example.com'
 });
 
 const status = await client.login();
 if (status.success) {
-	const cookies = client.getSessionCookies();
+  const cookies = client.getSessionCookies();
 
-	console.log(cookies);
-	/**
-	 * {
-	 *   AppframeWebAuth: {
-	 *     creation: [Date],
-	 *     hostOnly: [bool],
-	 *     httpOnly: [bool],
-	 *     path: [string],
-	 *     secure: [bool],
-	 *     value: [string],
-	 *   },
-	 *   AppframeWebSession: {
-	 *     creation: [Date],
-	 *     hostOnly: [bool],
-	 *     httpOnly: [bool],
-	 *     path: [string],
-	 *     secure: [bool],
-	 *     value: [string],
-	 *   }
-	 * }
-	 */
+  console.log(cookies);
+  /**
+   * {
+   *   AppframeWebAuth: {
+   *     creation: [Date],
+   *     hostOnly: [bool],
+   *     httpOnly: [bool],
+   *     path: [string],
+   *     secure: [bool],
+   *     value: [string],
+   *   },
+   *   AppframeWebSession: {
+   *     creation: [Date],
+   *     hostOnly: [bool],
+   *     httpOnly: [bool],
+   *     path: [string],
+   *     secure: [bool],
+   *     value: [string],
+   *   }
+   * }
+   */
 } else {
-	console.error(status.error);
+  console.error(status.error);
 }
 ```
 
@@ -100,13 +104,16 @@ if (status.success) {
 
 #### Breaking changes
 
- * Client requests now return the body of the response instead of the response. If the content type is JSON, the body will be parsed before it is returned as an object.
+ * Client requests now return the body of the response instead of the response.
+   If the content type is JSON, the body will be parsed before it is returned as
+   an object.
 
 ### [1.0.4] - 2018-12-14
 
 #### Changed
 
- * If server returns error on login, display the error instead of a login failed string.
+ * If server returns error on login, display the error instead of a login failed
+   string.
 
 ### [1.0.3] - 2018-11-26
 
