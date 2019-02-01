@@ -11,6 +11,7 @@ class AppframeClient {
     this.username = props.username;
     this.protocol = props.protocol || "https:";
     this.jar = null;
+    this._loginRequest = null;
   }
 
   getUrl(pathname, query) {
@@ -22,77 +23,92 @@ class AppframeClient {
     return url.toString();
   }
 
-  async login() {
-    if (this.jar) {
-      await this.logout();
-    }
-
-    this.jar = rp.jar();
-
-    const { password, username } = this;
-
-    const body = JSON.stringify({
-      username,
-      password,
-      remember: false
-    });
-
-    const options = {
-      body,
-      headers: {
-        Accept: "application/json",
-        "Content-Length": body.length,
-        "Content-Type": "application/json; charset=UTF-8",
-        "X-Requested-With": "XMLHttpRequest"
-      },
-      jar: this.jar,
-      method: "POST",
-      resolveWithFullResponse: true,
-      url: this.getUrl("login")
-    };
-
-    try {
-      console.log("Authenticating...");
-
-      const res = await rp(options);
-
-      if (res.statusCode === 200) {
-        const status = JSON.parse(res.body);
-
-        if (status.success) {
-          console.log("Authentication successful.");
-
-          return status;
+  login() {
+    if (
+      this._loginRequest !== null &&
+      typeof this._loginRequest.then === "function"
+    ) {
+      return this._loginRequest;
+    } else {
+      this._loginRequest = new Promise(async resolve => {
+        if (this.jar) {
+          await this.logout();
         }
 
-        const error = status.error
-          ? `Login failed: ${status.error}`
-          : loginFailedStr;
+        this.jar = rp.jar();
 
-        console.warn(error);
+        const { password, username } = this;
 
-        return Object.assign(
-          {
-            error,
-            success: false
+        const body = JSON.stringify({
+          username,
+          password,
+          remember: false
+        });
+
+        const options = {
+          body,
+          headers: {
+            Accept: "application/json",
+            "Content-Length": body.length,
+            "Content-Type": "application/json; charset=UTF-8",
+            "X-Requested-With": "XMLHttpRequest"
           },
-          status
-        );
-      }
+          jar: this.jar,
+          method: "POST",
+          resolveWithFullResponse: true,
+          url: this.getUrl("login")
+        };
 
-      console.warn(loginFailedStr);
+        try {
+          console.log("Authenticating...");
 
-      return {
-        error: `Login failed (${res.statusCode}: ${res.statusMessage})`,
-        success: false
-      };
-    } catch (err) {
-      console.error(err);
+          const res = await rp(options);
 
-      return {
-        error: err.message,
-        success: false
-      };
+          if (res.statusCode === 200) {
+            const status = JSON.parse(res.body);
+
+            if (status.success) {
+              console.log("Authentication successful.");
+
+              resolve(status);
+            } else {
+              const error = status.error
+                ? `Login failed: ${status.error}`
+                : loginFailedStr;
+
+              console.warn(error);
+
+              resolve(
+                Object.assign(
+                  {
+                    error,
+                    success: false
+                  },
+                  status
+                )
+              );
+            }
+          } else {
+            console.warn(loginFailedStr);
+
+            resolve({
+              error: `Login failed (${res.statusCode}: ${res.statusMessage})`,
+              success: false
+            });
+          }
+        } catch (err) {
+          console.error(err);
+
+          resolve({
+            error: err.message,
+            success: false
+          });
+        }
+
+        this._loginRequest = null;
+      });
+
+      return this._loginRequest;
     }
   }
 
