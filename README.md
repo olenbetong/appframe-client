@@ -1,4 +1,4 @@
-# Appframe Web Client 
+# Appframe Web Client
 
 A simple client to communicate with an AppframeWeb website in a node.js
 environment.
@@ -22,16 +22,16 @@ When authentication is complete, use the `get` or `post` methods to run requests
 to the AppframeWeb website.
 
 ```js
-const AppframeClient = require('@olenbetong/appframe-client');
+const AppframeClient = require("@olenbetong/appframe-client");
 const client = new AppframeClient({
-  username: 'mylogin',
-  password: 'Password1',
-  hostname: 'example.com'
+  username: "mylogin",
+  password: "Password1",
+  hostname: "example.com"
 });
 
 const status = await client.login();
 if (status.success) {
-  const myResponse = await client.get('/my/api');
+  const myResponse = await client.get("/my/api");
   const myApiData = JSON.parse(myResponse);
 
   console.log(myApiData);
@@ -44,11 +44,11 @@ If you want to use the client to log in, but use the session outside the client,
 you can get the session cookies using the `getSessionCookies` method.
 
 ```js
-const AppframeClient = require('@olenbetong/appframe-client');
+const AppframeClient = require("@olenbetong/appframe-client");
 const client = new AppframeClient({
-  username: 'mylogin',
-  password: 'Password1',
-  hostname: 'example.com'
+  username: "mylogin",
+  password: "Password1",
+  hostname: "example.com"
 });
 
 const status = await client.login();
@@ -83,62 +83,67 @@ if (status.success) {
 
 ## Changelog
 
+### [2.1.4] - 2019-06-06
+
+- Improved error message if unkown error causes login failed.
+- Update dependencies
+
 ### [2.1.2] - 2019-01-16
 
- * Removed obsolete stuff from README
- * Updated dependencies
+- Removed obsolete stuff from README
+- Updated dependencies
 
 ### [2.1.1] - 2018-12-18
 
 #### Changed
 
- * Git repository moved to olenbetong organization
+- Git repository moved to olenbetong organization
 
 ### [2.1.0] - 2018-12-18
 
 #### Added
 
- * `getSessionCookies` - New method to get session cookies
+- `getSessionCookies` - New method to get session cookies
 
 ### [2.0.0] - 2018-12-14
 
 #### Breaking changes
 
- * Client requests now return the body of the response instead of the response.
-   If the content type is JSON, the body will be parsed before it is returned as
-   an object.
+- Client requests now return the body of the response instead of the response.
+  If the content type is JSON, the body will be parsed before it is returned as
+  an object.
 
 ### [1.0.4] - 2018-12-14
 
 #### Changed
 
- * If server returns error on login, display the error instead of a login failed
-   string.
+- If server returns error on login, display the error instead of a login failed
+  string.
 
 ### [1.0.3] - 2018-11-26
 
 #### Changed
 
- * Updated dependencies
+- Updated dependencies
 
 ### [1.0.2] - 2018-11-26
 
 #### Fixed
 
- * Handle requests that are redirected to login page
+- Handle requests that are redirected to login page
 
 ### [1.0.1] - 2018-11-16
 
 #### Changed
 
- * Moved repository to GitHub
+- Moved repository to GitHub
 
 ### 1.0.0 - 2018-11-09
 
+- Migrated client to it's own NPM package from @olenbetong/appframe-proxy
 
- * Migrated client to it's own NPM package from @olenbetong/appframe-proxy
-
-[UNRELEASED]: https://github.com/bjornarvh/appframe-client/compare/v2.1.1...HEAD
+[unreleased]: https://github.com/bjornarvh/appframe-client/compare/v2.1.4...HEAD
+[2.1.4]: https://github.com/olenbetong/appframe-client/compare/v2.1.2...v2.1.4
 [2.1.2]: https://github.com/olenbetong/appframe-client/compare/v2.1.1...v2.1.2
 [2.1.1]: https://github.com/olenbetong/appframe-client/compare/v2.1.0...v2.1.0
 [2.1.0]: https://github.com/olenbetong/appframe-client/compare/v2.0.0...v2.1.0
