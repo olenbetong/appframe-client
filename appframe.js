@@ -97,7 +97,8 @@ class AppframeClient {
             });
           }
         } catch (err) {
-          console.error(err);
+          console.warn(`Failed to login to hostname '${this.hostname}'`);
+          console.error(err.message);
 
           resolve({
             error: err.message,
