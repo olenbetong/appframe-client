@@ -1,6 +1,6 @@
 {
   "name": "@olenbetong/appframe-client",
-  "version": "2.1.3",
+  "version": "2.1.4",
   "description": "Simple client class to log in to an AppframeWeb website and run requests with the session.",
   "main": "appframe.js",
   "scripts": {
