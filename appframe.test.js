@@ -1,7 +1,7 @@
 const dotenv = require("dotenv");
 const AppframeClient = require("./appframe");
 
-dotenv.load();
+dotenv.config();
 
 const {
   APPFRAME_LOGIN: username,
