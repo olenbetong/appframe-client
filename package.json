@@ -19,16 +19,16 @@
   "license": "MIT",
   "devDependencies": {
     "dotenv": "^8.0.0",
-    "eslint": "^5.16.0",
-    "eslint-config-prettier": "^4.3.0",
-    "eslint-plugin-jest": "^22.6.4",
+    "eslint": "^6.0.1",
+    "eslint-config-prettier": "^6.0.0",
+    "eslint-plugin-jest": "^22.7.2",
     "eslint-plugin-prettier": "^3.1.0",
     "jest": "^24.8.0",
-    "prettier": "^1.17.1"
+    "prettier": "^1.18.2"
   },
   "dependencies": {
     "cheerio": "^1.0.0-rc.3",
-    "deepmerge": "^3.2.0",
+    "deepmerge": "^4.0.0",
     "request-promise-native": "^1.0.7"
   }
 }
