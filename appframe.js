@@ -23,6 +23,81 @@ class AppframeClient {
     return url.toString();
   }
 
+  async loginAsync() {
+    if (this.jar) {
+      await this.logout();
+    }
+
+    this.jar = rp.jar();
+
+    const { password, username } = this;
+
+    const body = JSON.stringify({
+      username,
+      password,
+      remember: false,
+    });
+
+    const options = {
+      body,
+      headers: {
+        Accept: "application/json",
+        "Content-Length": body.length,
+        "Content-Type": "application/json; charset=UTF-8",
+        "X-Requested-With": "XMLHttpRequest",
+      },
+      jar: this.jar,
+      method: "POST",
+      resolveWithFullResponse: true,
+      url: this.getUrl("login"),
+    };
+
+    try {
+      console.log("Authenticating...");
+
+      const res = await rp(options);
+
+      if (res.statusCode === 200) {
+        const status = JSON.parse(res.body);
+
+        if (status.success) {
+          console.log("Authentication successful.");
+
+          return status;
+        } else {
+          const error = status.error
+            ? `Login failed: ${status.error}`
+            : loginFailedStr;
+
+          console.warn(error);
+
+          return Object.assign(
+            {
+              error,
+              success: false,
+            },
+            status
+          );
+        }
+      } else {
+        console.warn(loginFailedStr);
+
+        return {
+          error: `Login failed (${res.statusCode}: ${res.statusMessage})`,
+          success: false,
+        };
+      }
+    } catch (err) {
+      console.warn(`Failed to login to hostname '${this.hostname}'`);
+      console.error(err.message);
+
+      return {
+        error: err.message,
+        success: false,
+      };
+    }
+  }
+
   login() {
     if (
       this._loginRequest !== null &&
@@ -30,84 +105,9 @@ class AppframeClient {
     ) {
       return this._loginRequest;
     } else {
-      this._loginRequest = new Promise(async resolve => {
-        if (this.jar) {
-          await this.logout();
-        }
-
-        this.jar = rp.jar();
-
-        const { password, username } = this;
-
-        const body = JSON.stringify({
-          username,
-          password,
-          remember: false
-        });
-
-        const options = {
-          body,
-          headers: {
-            Accept: "application/json",
-            "Content-Length": body.length,
-            "Content-Type": "application/json; charset=UTF-8",
-            "X-Requested-With": "XMLHttpRequest"
-          },
-          jar: this.jar,
-          method: "POST",
-          resolveWithFullResponse: true,
-          url: this.getUrl("login")
-        };
-
-        try {
-          console.log("Authenticating...");
-
-          const res = await rp(options);
-
-          if (res.statusCode === 200) {
-            const status = JSON.parse(res.body);
-
-            if (status.success) {
-              console.log("Authentication successful.");
-
-              resolve(status);
-            } else {
-              const error = status.error
-                ? `Login failed: ${status.error}`
-                : loginFailedStr;
-
-              console.warn(error);
-
-              resolve(
-                Object.assign(
-                  {
-                    error,
-                    success: false
-                  },
-                  status
-                )
-              );
-            }
-          } else {
-            console.warn(loginFailedStr);
-
-            resolve({
-              error: `Login failed (${res.statusCode}: ${res.statusMessage})`,
-              success: false
-            });
-          }
-        } catch (err) {
-          console.warn(`Failed to login to hostname '${this.hostname}'`);
-          console.error(err.message);
-
-          resolve({
-            error: err.message,
-            success: false
-          });
-        }
-
-        this._loginRequest = null;
-      });
+      this._loginRequest = this.loginAsync().finally(
+        () => (this._loginRequest = null)
+      );
 
       return this._loginRequest;
     }
@@ -118,10 +118,10 @@ class AppframeClient {
       jar: this.jar,
       headers: {
         Accept: "application/json",
-        "X-Requested-With": "XMLHttpRequest"
+        "X-Requested-With": "XMLHttpRequest",
       },
       method: "POST",
-      url: this.getUrl("logout")
+      url: this.getUrl("logout"),
     };
 
     try {
@@ -152,7 +152,7 @@ class AppframeClient {
     const [pathname, search] = path.split("?");
 
     return Object.assign({ method }, options, {
-      uri: this.getUrl(pathname, search)
+      uri: this.getUrl(pathname, search),
     });
   }
 
@@ -171,14 +171,16 @@ class AppframeClient {
             hostOnly: cookie.hostOnly,
             path: cookie.path,
             secure: cookie.secure,
-            value: cookie.value
+            value: cookie.value,
           };
         }
       }
 
+      let cookieNames = Object.keys(cookies);
+
       if (
-        !cookies.hasOwnProperty("AppframeWebAuth") ||
-        !cookies.hasOwnProperty("AppframeWebSession")
+        !cookieNames.includes("AppframeWebAuth") ||
+        !cookieNames.includes("AppframeWebSession")
       ) {
         return null;
       }
@@ -206,8 +208,8 @@ class AppframeClient {
       {
         resolveWithFullResponse: true,
         headers: {
-          "X-Requested-With": "XMLHttpRequest" // setting X-Requested-With makes the server return 401 instead of redirecting to login
-        }
+          "X-Requested-With": "XMLHttpRequest", // setting X-Requested-With makes the server return 401 instead of redirecting to login
+        },
       },
       options
     );
@@ -254,7 +256,7 @@ class AppframeClient {
         error: errorMessage,
         success: false,
         statusCode: err.statusCode,
-        statusMessage: err.response && err.response.statusMessage
+        statusMessage: err.response && err.response.statusMessage,
       };
     }
   }

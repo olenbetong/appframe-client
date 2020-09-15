@@ -88,13 +88,17 @@ describe("AppframeClient", () => {
   it("parses error messages properly", async () => {
     const result = await client.post(encodeURIComponent(testPath));
 
-    expect(result).toEqual({
-      error:
-        "400 - A potentially dangerous Request.Path value was detected from the client (?).",
-      statusCode: 400,
-      statusMessage: "Bad Request",
-      success: false
-    });
+    expect(result.statusCode).toEqual(400);
+    expect(result.statusMessage).toEqual("Bad Request");
+    expect(result.success).toEqual(false);
+    expect(result.error).toMatch(/400 - \[HttpException: A potentially dangerous Request.Path value was detected from the client/);
+    // expect(result).toEqual({
+    //   error:
+    //     "400 - A potentially dangerous Request.Path value was detected from the client (?).",
+    //   statusCode: 400,
+    //   statusMessage: "Bad Request",
+    //   success: false
+    // });
   });
 
   it("handles server errors", async () => {
