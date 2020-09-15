@@ -6,13 +6,13 @@ dotenv.config();
 const {
   APPFRAME_LOGIN: username,
   APPFRAME_PWD: password,
-  APPFRAME_HOSTNAME: hostname
+  APPFRAME_HOSTNAME: hostname,
 } = process.env;
 
 const failedClient = new AppframeClient({
   hostname,
   password: "asdlkfje",
-  username: "asldkfje"
+  username: "asldkfje",
 });
 
 const testPath = "/api/elements/1.0/projects?ProjectID=P16-1157";
@@ -24,7 +24,7 @@ describe("AppframeClient", () => {
     client = new AppframeClient({
       hostname,
       password,
-      username
+      username,
     });
   });
 
@@ -39,7 +39,7 @@ describe("AppframeClient", () => {
       error: "401 - Session expired. Login attempt failed.",
       statusCode: 401,
       statusMessage: "Unauthorized",
-      success: false
+      success: false,
     });
 
     await failedClient.logout();
@@ -91,7 +91,9 @@ describe("AppframeClient", () => {
     expect(result.statusCode).toEqual(400);
     expect(result.statusMessage).toEqual("Bad Request");
     expect(result.success).toEqual(false);
-    expect(result.error).toMatch(/400 - \[HttpException: A potentially dangerous Request.Path value was detected from the client/);
+    expect(result.error).toMatch(
+      /400 - \[HttpException: A potentially dangerous Request.Path value was detected from the client/
+    );
     // expect(result).toEqual({
     //   error:
     //     "400 - A potentially dangerous Request.Path value was detected from the client (?).",
@@ -104,9 +106,7 @@ describe("AppframeClient", () => {
   it("handles server errors", async () => {
     const articleId =
       "article-that-should-never-ever-exist-" +
-      Math.random()
-        .toString(32)
-        .slice(2);
+      Math.random().toString(32).slice(2);
 
     const result = await client.get(articleId);
 
@@ -114,7 +114,7 @@ describe("AppframeClient", () => {
       error: "404 - Not Found",
       statusCode: 404,
       statusMessage: "Not Found",
-      success: false
+      success: false,
     });
   });
 

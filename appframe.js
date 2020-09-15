@@ -1,4 +1,6 @@
-const rp = require("request-promise-native");
+const nodeFetch = require("node-fetch");
+const fetchCookie = require("fetch-cookie");
+const tough = require("tough-cookie");
 const cheerio = require("cheerio");
 const merge = require("deepmerge");
 
@@ -10,7 +12,8 @@ class AppframeClient {
     this.password = props.password;
     this.username = props.username;
     this.protocol = props.protocol || "https:";
-    this.jar = null;
+    this.jar = new tough.CookieJar();
+    this.fetch = fetchCookie(nodeFetch, this.jar);
     this._loginRequest = null;
   }
 
@@ -24,11 +27,11 @@ class AppframeClient {
   }
 
   async loginAsync() {
-    if (this.jar) {
+    if (await this.jar.getCookieString("AppframeWebAuth")) {
       await this.logout();
     }
 
-    this.jar = rp.jar();
+    await this.jar.removeAllCookies();
 
     const { password, username } = this;
 
@@ -38,7 +41,8 @@ class AppframeClient {
       remember: false,
     });
 
-    const options = {
+    let url = this.getUrl("login");
+    let options = {
       body,
       headers: {
         Accept: "application/json",
@@ -46,30 +50,21 @@ class AppframeClient {
         "Content-Type": "application/json; charset=UTF-8",
         "X-Requested-With": "XMLHttpRequest",
       },
-      jar: this.jar,
       method: "POST",
-      resolveWithFullResponse: true,
-      url: this.getUrl("login"),
     };
 
     try {
-      console.log("Authenticating...");
+      const response = await this.fetch(url, options);
 
-      const res = await rp(options);
-
-      if (res.statusCode === 200) {
-        const status = JSON.parse(res.body);
+      if (response.ok) {
+        const status = await response.json();
 
         if (status.success) {
-          console.log("Authentication successful.");
-
           return status;
         } else {
           const error = status.error
             ? `Login failed: ${status.error}`
             : loginFailedStr;
-
-          console.warn(error);
 
           return Object.assign(
             {
@@ -80,17 +75,12 @@ class AppframeClient {
           );
         }
       } else {
-        console.warn(loginFailedStr);
-
         return {
-          error: `Login failed (${res.statusCode}: ${res.statusMessage})`,
+          error: `Login failed (${response.statusCode}: ${response.statusMessage})`,
           success: false,
         };
       }
     } catch (err) {
-      console.warn(`Failed to login to hostname '${this.hostname}'`);
-      console.error(err.message);
-
       return {
         error: err.message,
         success: false,
@@ -114,30 +104,26 @@ class AppframeClient {
   }
 
   async logout() {
-    const reqOptions = {
-      jar: this.jar,
+    let url = this.getUrl("logout");
+    let reqOptions = {
       headers: {
         Accept: "application/json",
         "X-Requested-With": "XMLHttpRequest",
       },
       method: "POST",
-      url: this.getUrl("logout"),
     };
 
     try {
-      console.log("Logging out...");
-      await rp(reqOptions);
+      await this.fetch(url, reqOptions);
     } catch (err) {
       if (err.statusCode !== 303) {
-        this.jar = null;
-        console.err(err.message);
+        await this.jar.removeAllCookies();
 
         return false;
       }
     }
 
-    this.jar = null;
-    console.log("Logged out");
+    await this.jar.removeAllCookies();
 
     return true;
   }
@@ -152,13 +138,15 @@ class AppframeClient {
     const [pathname, search] = path.split("?");
 
     return Object.assign({ method }, options, {
-      uri: this.getUrl(pathname, search),
+      url: this.getUrl(pathname, search),
     });
   }
 
   getSessionCookies() {
     if (this.jar) {
-      let sessionCookies = this.jar.getCookies(
+      let url = `${this.protocol}//${this.hostname}`;
+
+      let sessionCookies = this.jar.getCookiesSync(
         `${this.protocol}//${this.hostname}`
       );
       let cookies = {};
@@ -204,9 +192,8 @@ class AppframeClient {
   }
 
   async request(options, isRetry = false) {
-    const reqOptions = merge(
+    let reqOptions = merge(
       {
-        resolveWithFullResponse: true,
         headers: {
           "X-Requested-With": "XMLHttpRequest", // setting X-Requested-With makes the server return 401 instead of redirecting to login
         },
@@ -214,22 +201,33 @@ class AppframeClient {
       options
     );
 
-    reqOptions.jar = this.jar;
-
     try {
-      const res = await rp(reqOptions);
-      const contentType = res.headers["content-type"];
-      if (contentType && contentType.indexOf("application/json") > -1) {
-        return JSON.parse(res.body);
-      }
+      let response = await this.fetch(options.url, reqOptions);
 
-      return res;
+      if (response.ok) {
+        let contentType = response.headers.get("content-type");
+
+        if (contentType && contentType.indexOf("application/json") > -1) {
+          return await response.json();
+        }
+
+        return await response.text();
+      } else {
+        let contentType = response.headers.get("content-type");
+        let body = await response.text();
+
+        throw {
+          error: body,
+          statusCode: response.status,
+          statusMessage: response.statusText,
+        };
+      }
     } catch (err) {
       let errorMessage = err.message;
 
       if (err.statusCode === 401) {
         if (!isRetry) {
-          const loginRes = await this.login();
+          let loginRes = await this.login();
 
           if (loginRes.success) {
             return await this.request(options, true);
@@ -240,23 +238,21 @@ class AppframeClient {
           errorMessage =
             "401 - Session expired. Failed to re-run request after new login.";
         }
-      } else if (err.error.toLowerCase().indexOf("doctype") >= 0) {
+      } else if (err.error?.toLowerCase().indexOf("doctype") >= 0) {
         errorMessage = this.getErrorFromBody(err.error);
 
         if (errorMessage) errorMessage = `${err.statusCode} - ${errorMessage}`;
       }
 
       if (!errorMessage && err.statusCode) {
-        errorMessage = `${err.statusCode} - ${err.response.statusMessage}`;
+        errorMessage = `${err.statusCode} - ${err.statusMessage}`;
       }
-
-      console.error(errorMessage);
 
       return {
         error: errorMessage,
         success: false,
         statusCode: err.statusCode,
-        statusMessage: err.response && err.response.statusMessage,
+        statusMessage: err.statusMessage,
       };
     }
   }
