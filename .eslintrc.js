@@ -2,14 +2,14 @@ module.exports = {
   env: {
     es6: true,
     node: true,
-    jest: true
+    jest: true,
   },
   extends: "eslint:recommended",
   parserOptions: {
-    ecmaVersion: 2018
+    ecmaVersion: 2020,
   },
   plugins: ["jest", "prettier"],
   rules: {
-    "no-console": "off"
-  }
+    "no-console": "off",
+  },
 };

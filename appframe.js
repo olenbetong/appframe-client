@@ -145,10 +145,7 @@ class AppframeClient {
   getSessionCookies() {
     if (this.jar) {
       let url = `${this.protocol}//${this.hostname}`;
-
-      let sessionCookies = this.jar.getCookiesSync(
-        `${this.protocol}//${this.hostname}`
-      );
+      let sessionCookies = this.jar.getCookiesSync(url);
       let cookies = {};
 
       for (let cookie of sessionCookies) {
@@ -213,7 +210,6 @@ class AppframeClient {
 
         return await response.text();
       } else {
-        let contentType = response.headers.get("content-type");
         let body = await response.text();
 
         throw {
